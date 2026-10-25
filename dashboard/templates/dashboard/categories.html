@@ -1,0 +1,21 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Categories{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Categories</h1>
+<div class="grid md:grid-cols-3 gap-6">
+ <form method="post" enctype="multipart/form-data" class="f bg-white rounded-3xl p-5 space-y-3 h-fit">
+  {% csrf_token %}<h2 class="font-bold">Add a category</h2>
+  {{ form.name.errors }}{{ form.name }}<label class="text-sm block">Image (optional){{ form.image }}</label>
+  <button class="w-full rounded-full bg-blush-500 text-white font-bold py-2">Add category</button>
+ </form>
+ <div class="md:col-span-2 bg-white rounded-3xl p-5">
+  {% for c in categories %}
+  <div class="flex items-center gap-3 py-3 border-b border-blush-50">
+   <div class="w-12 h-12 rounded-xl bg-blush-100 overflow-hidden grid place-items-center">{% if c.image %}<img src="{{ c.image.url }}" class="w-full h-full object-cover" alt="">{% else %}🎀{% endif %}</div>
+   <div class="flex-1"><p class="font-semibold">{{ c.name }}</p><p class="text-sm">{{ c.n }} product{{ c.n|pluralize }}</p></div>
+   <a href="{% url 'dashboard:category_edit' c.pk %}" class="text-sm underline">Edit</a>
+   <form method="post" action="{% url 'dashboard:category_delete' c.pk %}" onsubmit="return confirm('Delete {{ c.name|escapejs }}?')">{% csrf_token %}<button class="text-sm text-red-500 underline">Delete</button></form>
+  </div>{% empty %}<p>No categories yet. Add your first one.</p>{% endfor %}
+ </div>
+</div>
+{% endblock %}

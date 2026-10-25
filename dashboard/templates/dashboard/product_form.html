@@ -1,0 +1,19 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{% if product %}Edit{% else %}New{% endif %} product{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="f max-w-2xl bg-white rounded-3xl p-6 space-y-4">
+ {% csrf_token %}<h1 class="text-xl font-bold">{% if product %}Edit {{ product.name }}{% else %}New product{% endif %}</h1>
+ {{ form.non_field_errors }}
+ {% for f in form %}
+ <div><label class="text-sm font-semibold" for="{{ f.id_for_label }}">{{ f.label }}</label>
+  <div>{{ f }}</div>{% if f.help_text %}<p class="text-xs text-stone-500">{{ f.help_text }}</p>{% endif %}
+  {% for e in f.errors %}<p class="text-sm text-red-500">{{ e }}</p>{% endfor %}</div>
+ {% endfor %}
+ {% if product and product.images.all %}
+ <div><p class="text-sm font-semibold mb-2">Current photos (tick to remove)</p><div class="flex gap-3 flex-wrap">
+  {% for i in product.images.all %}<label class="block text-center text-xs"><img src="{{ i.image.url }}" class="w-20 h-24 object-cover rounded-xl" alt=""><input type="checkbox" name="delete_images" value="{{ i.pk }}"> remove</label>{% endfor %}</div></div>
+ {% endif %}
+ <div><label class="text-sm font-semibold">Add photos (you can select several)</label><input type="file" name="images" accept="image/*" multiple></div>
+ <div class="flex gap-3"><button class="rounded-full bg-blush-500 text-white font-bold px-6 py-2">Save product</button><a href="{% url 'dashboard:products' %}" class="px-4 py-2">Cancel</a></div>
+</form>
+{% endblock %}

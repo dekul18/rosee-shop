@@ -1,0 +1,9 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" class="f max-w-md bg-white rounded-3xl p-6 space-y-3">
+ {% csrf_token %}<h1 class="text-xl font-bold">{{ title }}</h1>
+ {{ form.as_p }}
+ <div class="flex gap-3"><button class="rounded-full bg-blush-500 text-white font-bold px-6 py-2">Save</button>
+ <a href="{% url back %}" class="px-4 py-2">Cancel</a></div>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-3">Orders</h1>
+<div class="flex gap-2 overflow-x-auto mb-4 text-sm font-semibold">
+ <a href="{% url 'dashboard:orders' %}" class="px-4 py-1.5 rounded-full {% if not status %}bg-blush-500 text-white{% else %}bg-white{% endif %}">All</a>
+ {% for v, l in statuses %}<a href="?status={{ v }}" class="px-4 py-1.5 rounded-full {% if status == v %}bg-blush-500 text-white{% else %}bg-white{% endif %}">{{ l }}</a>{% endfor %}
+</div>
+<div class="bg-white rounded-3xl p-3 overflow-x-auto"><table class="w-full text-left">
+ <thead class="text-sm"><tr><th class="p-2">#</th><th>Customer</th><th>Wilaya</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+ {% for o in orders %}<tr class="border-t border-blush-50"><td class="p-2"><a class="underline" href="{% url 'dashboard:order_detail' o.pk %}">#{{ o.pk }}</a></td><td>{{ o.full_name }}<br><span class="text-xs">{{ o.phone }}</span></td><td>{{ o.wilaya }}</td><td>{{ o.total|floatformat:0 }} DZD</td><td>{{ o.get_status_display }}</td><td class="text-sm">{{ o.created_at|date:"d M, H:i" }}</td></tr>
+ {% empty %}<tr><td colspan="6" class="p-4">No orders here yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

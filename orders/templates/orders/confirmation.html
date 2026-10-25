@@ -1,0 +1,13 @@
+{% extends "store/base.html" %}
+{% block content %}
+<section class="max-w-xl mx-auto px-4 pt-16 text-center">
+ <div class="text-6xl">💌</div>
+ <h1 class="font-display text-4xl font-semibold mt-4">Thank you, {{ order.full_name }}!</h1>
+ <p class="mt-3">Order #{{ order.pk }} is received. We will call {{ order.phone }} to confirm your delivery.</p>
+ <div class="mt-6 bg-white dark:bg-plum rounded-3xl p-5 text-left space-y-2">
+  {% for i in order.items.all %}<div class="flex justify-between"><span>{{ i.quantity }} × {{ i.name }} <span class="text-stone-500 text-sm">{{ i.size }} {{ i.color }}</span></span><span>{{ i.subtotal|floatformat:0 }} DZD</span></div>{% endfor %}
+  <div class="flex justify-between font-bold border-t border-blush-100 dark:border-night pt-2"><span>Pay on delivery</span><span>{{ order.total|floatformat:0 }} DZD</span></div>
+ </div>
+ <a href="{% url 'store:shop' %}" class="btn inline-block mt-8 rounded-full bg-blush-500 text-white font-bold px-8 py-3">Keep shopping</a>
+</section>
+{% endblock %}

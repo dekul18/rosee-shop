@@ -1,0 +1,13 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<form method="post" class="f max-w-sm mx-auto mt-16 bg-white rounded-3xl p-6 space-y-4 shadow-sm">
+ {% csrf_token %}<h1 class="font-display italic text-4xl text-blush-500">{{ SHOP_NAME }}</h1>
+ <p class="text-sm">Shop admin login</p>
+ {% if form.errors %}<p class="text-red-500 text-sm">Wrong username or password.</p>{% endif %}
+ {{ form.username }}{{ form.password }}
+ <input type="hidden" name="next" value="{{ next }}">
+ <button class="w-full rounded-full bg-blush-500 text-white font-bold py-2.5">Log in</button>
+</form>
+<script>document.querySelector('#id_username').placeholder='Username';document.querySelector('#id_password').placeholder='Password'</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "store/base.html" %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 pt-10 pb-6 grid md:grid-cols-2 gap-8 items-center">
+ <div class="reveal">
+  <h1 class="font-display text-5xl sm:text-7xl leading-[0.95] font-semibold text-stone-800 dark:text-white">Soft things<br>to wear, <i class="text-blush-500">every day.</i></h1>
+  <p class="mt-5 max-w-md text-lg">Dresses, tops, skirts and little extras in blush, lilac and cream. Order from your phone and pay when it arrives.</p>
+  <a href="{% url 'store:shop' %}" class="btn inline-block mt-7 rounded-full bg-blush-500 text-white font-bold px-8 py-3">Shop the collection</a>
+ </div>
+ <div class="relative h-72 sm:h-96 reveal" aria-hidden="true">
+  <div class="arch absolute left-4 bottom-0 w-44 sm:w-56 h-64 sm:h-80 bg-blush-200 dark:bg-blush-500/40"></div>
+  <div class="arch absolute left-36 sm:left-48 bottom-0 w-40 sm:w-52 h-56 sm:h-72 bg-lilac-200 dark:bg-lilac-500/40"></div>
+  <div class="arch absolute right-0 bottom-0 w-28 sm:w-36 h-40 sm:h-52 bg-rosegold/50"></div>
+  <span class="absolute top-4 right-10 text-4xl">✨</span>
+ </div>
+</section>
+
+{% if categories %}
+<section class="max-w-6xl mx-auto px-4 mt-10">
+ <h2 class="font-display text-3xl font-semibold mb-5">Shop by category</h2>
+ <div class="flex gap-4 overflow-x-auto pb-3">
+  {% for c in categories %}
+  <a href="{% url 'store:shop' %}?cat={{ c.slug }}" class="reveal shrink-0 w-32 text-center group">
+   <div class="arch w-32 h-40 overflow-hidden ph grid place-items-center text-4xl group-hover:shadow-lg transition-shadow">
+    {% if c.image %}<img src="{{ c.image.url }}" alt="" class="w-full h-full object-cover">{% else %}🎀{% endif %}</div>
+   <p class="mt-2 font-semibold">{{ c.name }}</p></a>
+  {% endfor %}
+ </div>
+</section>
+{% endif %}
+
+<section class="max-w-6xl mx-auto px-4 mt-12">
+ <h2 class="font-display text-3xl font-semibold mb-5">Fresh picks</h2>
+ {% if products %}
+ <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">{% for p in products %}{% include "store/_card.html" %}{% endfor %}</div>
+ {% else %}<p>New pieces are on their way. Check back soon.</p>{% endif %}
+</section>
+{% endblock %}

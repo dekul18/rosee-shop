@@ -1,0 +1,20 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="flex flex-wrap items-center gap-3 mb-4">
+ <h1 class="text-2xl font-bold">Products</h1>
+ <form method="get" class="ml-auto"><select name="cat" onchange="this.form.submit()" class="rounded-full border border-blush-300 px-3 py-1.5 bg-white">
+  <option value="">All categories</option>{% for c in categories %}<option value="{{ c.pk }}" {% if cat == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></form>
+ <a href="{% url 'dashboard:product_new' %}" class="rounded-full bg-blush-500 text-white font-bold px-5 py-2">Add product</a>
+</div>
+<div class="bg-white rounded-3xl p-3 overflow-x-auto">
+ <table class="w-full text-left"><thead class="text-sm"><tr><th class="p-2">Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+ {% for p in products %}<tr class="border-t border-blush-50">
+  <td class="p-2 flex items-center gap-3"><div class="w-12 h-14 rounded-xl bg-blush-100 overflow-hidden grid place-items-center">{% if p.main_image %}<img src="{{ p.main_image }}" class="w-full h-full object-cover" alt="">{% else %}🌸{% endif %}</div>{{ p.name }}</td>
+  <td>{{ p.category.name }}</td><td>{{ p.price|floatformat:0 }} DZD</td><td class="{% if p.stock <= 5 %}text-red-500 font-bold{% endif %}">{{ p.stock }}</td>
+  <td>{% if p.is_active %}Visible{% else %}Hidden{% endif %}</td>
+  <td class="whitespace-nowrap"><a class="underline text-sm" href="{% url 'dashboard:product_edit' p.pk %}">Edit</a>
+   <form method="post" action="{% url 'dashboard:product_delete' p.pk %}" class="inline" onsubmit="return confirm('Delete this product?')">{% csrf_token %}<button class="underline text-sm text-red-500 ml-2">Delete</button></form></td></tr>
+ {% empty %}<tr><td class="p-4" colspan="6">No products yet.</td></tr>{% endfor %}</table>
+</div>
+{% endblock %}

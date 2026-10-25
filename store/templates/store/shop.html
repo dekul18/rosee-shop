@@ -1,0 +1,14 @@
+{% extends "store/base.html" %}
+{% block title %}Shop · {{ SHOP_NAME }}{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 pt-8">
+ <h1 class="font-display text-4xl font-semibold">{% if q %}Results for “{{ q }}”{% else %}The collection{% endif %}</h1>
+ <div id="cats" class="flex gap-2 overflow-x-auto py-4 sticky top-[69px] z-20 bg-cream/90 dark:bg-night/90 backdrop-blur" data-active="{{ active_cat }}">
+  <button data-cat="" class="cat shrink-0 px-5 py-2 rounded-full bg-blush-100 dark:bg-plum font-semibold">All</button>
+  {% for c in categories %}<button data-cat="{{ c.slug }}" class="cat shrink-0 px-5 py-2 rounded-full bg-blush-100 dark:bg-plum font-semibold">{{ c.name }}</button>{% endfor %}
+ </div>
+ <div id="grid" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">{% for p in products %}{% include "store/_card.html" %}{% endfor %}</div>
+ <p id="empty" class="hidden py-16 text-center">Nothing matches yet. Try another category or search.</p>
+ {% if not products %}<p class="py-16 text-center">No products found.</p>{% endif %}
+</section>
+{% endblock %}

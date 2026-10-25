@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf" content="{{ csrf_token }}">
+<title>{% block title %}{{ SHOP_NAME }} · Women's clothing{% endblock %}</title>
+<script>if(localStorage.theme==='dark')document.documentElement.classList.add('dark')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{
+ fontFamily:{display:['"Cormorant Garamond"','serif'],sans:['Nunito','system-ui','sans-serif']},
+ colors:{blush:{50:'#fff5f8',100:'#ffe6ee',200:'#ffcadb',300:'#f9a6c1',400:'#ef7fa6',500:'#dd5c8b'},
+         lilac:{100:'#f1eaff',200:'#e2d6ff',300:'#cbb8f8',500:'#9a7fe0'},
+         cream:'#fffaf4',rosegold:'#c48b7b',night:'#1c1724',plum:'#2a2236'}}}}
+</script>
+<style>
+ .arch{border-radius:999px 999px 1.25rem 1.25rem}
+ .reveal{opacity:0;transform:translateY(14px);transition:opacity .7s ease,transform .7s ease}
+ .reveal.in{opacity:1;transform:none}
+ .ph{background:linear-gradient(160deg,#ffe6ee,#e2d6ff)}
+ .dark .ph{background:linear-gradient(160deg,#3b2a45,#2e2a52)}
+ .btn{transition:transform .15s ease,box-shadow .2s ease,background .2s}
+ .btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px -10px #dd5c8b99}
+ .btn:active{transform:translateY(0) scale(.98)}
+ .field{width:100%;border-radius:1rem;border:1px solid #f9a6c1;background:#fff;padding:.65rem .9rem;outline:none}
+ .field:focus{box-shadow:0 0 0 3px #ffcadb}
+ .dark .field{background:#2a2236;border-color:#4b3a5c;color:#f5eef8}
+ @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.btn{transition:none}}
+</style>
+</head>
+<body class="font-sans bg-cream text-stone-700 dark:bg-night dark:text-stone-200 min-h-screen flex flex-col">
+<header class="sticky top-0 z-30 bg-cream/90 dark:bg-night/90 backdrop-blur border-b border-blush-100 dark:border-plum">
+ <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
+  <a href="{% url 'store:home' %}" class="font-display text-3xl italic font-semibold text-blush-500">{{ SHOP_NAME }}</a>
+  <form action="{% url 'store:shop' %}" method="get" class="flex-1 max-w-md ml-auto">
+   <input id="search" name="q" value="{{ q|default:'' }}" placeholder="Search dresses, tops…" aria-label="Search products" class="field !rounded-full !py-2">
+  </form>
+  <button id="theme" type="button" aria-label="Toggle light or dark mode" class="w-10 h-10 rounded-full bg-blush-100 dark:bg-plum grid place-items-center">🌙</button>
+  <a href="{% url 'orders:cart' %}" aria-label="Cart" class="relative w-10 h-10 rounded-full bg-blush-100 dark:bg-plum grid place-items-center">🛍
+   <span id="cart-count" class="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-blush-500 text-white text-xs grid place-items-center {% if not cart_count %}hidden{% endif %}">{{ cart_count }}</span></a>
+ </div>
+</header>
+<main class="flex-1">{% block content %}{% endblock %}</main>
+<footer class="mt-16 py-8 text-center text-sm text-stone-500 dark:text-stone-400">© {% now "Y" %} {{ SHOP_NAME }}. Cash on delivery across Algeria.</footer>
+
+<div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden px-5 py-3 rounded-full bg-stone-800 text-white text-sm shadow-lg"></div>
+
+<div id="modal" class="fixed inset-0 z-40 hidden items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4" role="dialog" aria-modal="true" aria-labelledby="m-name">
+ <div class="bg-cream dark:bg-plum w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-2xl relative">
+  <button id="m-close" aria-label="Close" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 dark:bg-night/80 z-10">✕</button>
+  <div class="grid sm:grid-cols-2 gap-6 p-5 sm:p-6">
+   <div>
+    <div id="m-main" class="aspect-[4/5] rounded-2xl overflow-hidden ph grid place-items-center text-6xl"></div>
+    <div id="m-thumbs" class="flex gap-2 mt-3 overflow-x-auto"></div>
+   </div>
+   <div class="flex flex-col gap-4">
+    <div><p id="m-cat" class="text-sm text-lilac-500"></p><h2 id="m-name" class="font-display text-3xl font-semibold"></h2>
+     <p id="m-price" class="text-xl text-blush-500 font-bold mt-1"></p></div>
+    <p id="m-desc" class="text-sm leading-relaxed"></p>
+    <div><p class="text-sm font-semibold mb-2">Size</p><div id="m-sizes" class="flex flex-wrap gap-2"></div></div>
+    <div id="m-colors-wrap"><p class="text-sm font-semibold mb-2">Color</p><div id="m-colors" class="flex flex-wrap gap-2"></div></div>
+    <div class="flex items-center gap-3">
+     <button id="q-" class="w-9 h-9 rounded-full bg-blush-100 dark:bg-night" aria-label="Less">−</button>
+     <span id="q" class="w-6 text-center font-bold">1</span>
+     <button id="q+" class="w-9 h-9 rounded-full bg-blush-100 dark:bg-night" aria-label="More">+</button>
+     <span id="m-stock" class="text-xs text-stone-500 ml-2"></span>
+    </div>
+    <p id="m-err" class="text-sm text-red-500 hidden"></p>
+    <button id="m-add" class="btn rounded-full bg-blush-500 hover:bg-blush-400 text-white font-bold py-3">Add to cart</button>
+   </div>
+  </div>
+ </div>
+</div>
+{% if products_json is not None %}{{ products_json|json_script:"products-data" }}{% endif %}
+<script src="{% load static %}{% static 'js/shop.js' %}"></script>
+</body>
+</html>

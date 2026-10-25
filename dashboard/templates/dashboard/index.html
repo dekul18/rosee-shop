@@ -1,0 +1,15 @@
+{% extends "dashboard/base.html" %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Overview</h1>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+ <div class="bg-white rounded-3xl p-5"><p class="text-sm">Orders</p><p class="text-3xl font-bold">{{ orders_count }}</p></div>
+ <div class="bg-white rounded-3xl p-5"><p class="text-sm">Waiting for confirmation</p><p class="text-3xl font-bold text-blush-500">{{ pending_count }}</p></div>
+ <div class="bg-white rounded-3xl p-5"><p class="text-sm">Revenue (excl. cancelled)</p><p class="text-3xl font-bold">{{ revenue|floatformat:0 }} DZD</p></div>
+</div>
+<div class="grid md:grid-cols-2 gap-4 mt-6">
+ <div class="bg-white rounded-3xl p-5"><h2 class="font-bold mb-3">Latest orders</h2>
+  {% for o in recent %}<a href="{% url 'dashboard:order_detail' o.pk %}" class="flex justify-between py-2 border-b border-blush-50"><span>#{{ o.pk }} {{ o.full_name }}</span><span>{{ o.get_status_display }}</span></a>{% empty %}<p>No orders yet.</p>{% endfor %}</div>
+ <div class="bg-white rounded-3xl p-5"><h2 class="font-bold mb-3">Low stock (≤ {{ low_limit }})</h2>
+  {% for p in low_stock %}<a href="{% url 'dashboard:product_edit' p.pk %}" class="flex justify-between py-2 border-b border-blush-50"><span>{{ p.name }}</span><span class="{% if p.stock == 0 %}text-red-500{% endif %}">{{ p.stock }} left</span></a>{% empty %}<p>All products are well stocked.</p>{% endfor %}</div>
+</div>
+{% endblock %}

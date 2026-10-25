@@ -1,0 +1,18 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block content %}
+<a href="{% url 'dashboard:orders' %}" class="text-sm underline">← All orders</a>
+<h1 class="text-2xl font-bold my-3">Order #{{ order.pk }} <span class="text-base font-normal">· {{ order.created_at|date:"d M Y, H:i" }}</span></h1>
+<div class="grid md:grid-cols-2 gap-6">
+ <div class="bg-white rounded-3xl p-5 space-y-1"><h2 class="font-bold mb-2">Customer</h2>
+  <p>{{ order.full_name }}</p><p><a class="underline" href="tel:{{ order.phone }}">{{ order.phone }}</a></p><p>{{ order.wilaya }} — {{ order.address }}</p>
+  {% if order.notes %}<p class="text-sm bg-blush-50 rounded-xl p-2 mt-2">{{ order.notes }}</p>{% endif %}</div>
+ <form method="post" class="bg-white rounded-3xl p-5 space-y-3 h-fit">{% csrf_token %}<h2 class="font-bold">Status</h2>
+  <div class="flex flex-wrap gap-2">{% for v, l in statuses %}
+   <button name="status" value="{{ v }}" class="px-4 py-1.5 rounded-full text-sm font-semibold {% if order.status == v %}bg-blush-500 text-white{% else %}bg-blush-100{% endif %}">{{ l }}</button>{% endfor %}</div>
+  <p class="text-xs">Flow: Pending → Confirmed → Shipped → Delivered → Done</p></form>
+</div>
+<div class="bg-white rounded-3xl p-5 mt-6"><h2 class="font-bold mb-2">Items</h2>
+ {% for i in order.items.all %}<div class="flex justify-between py-2 border-b border-blush-50"><span>{{ i.quantity }} × {{ i.name }} <span class="text-sm">{{ i.size }} {{ i.color }}</span></span><span>{{ i.subtotal|floatformat:0 }} DZD</span></div>{% endfor %}
+ <p class="flex justify-between font-bold pt-3"><span>Total (cash on delivery)</span><span>{{ order.total|floatformat:0 }} DZD</span></p></div>
+{% endblock %}

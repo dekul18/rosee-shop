@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Dashboard{% endblock %} · {{ SHOP_NAME }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{display:['"Cormorant Garamond"','serif'],sans:['Nunito','sans-serif']},colors:{blush:{50:'#fff5f8',100:'#ffe6ee',200:'#ffcadb',300:'#f9a6c1',500:'#dd5c8b'},lilac:{100:'#f1eaff',500:'#9a7fe0'}}}}}</script>
+<style>.f input:not([type=checkbox]):not([type=file]),.f select,.f textarea{width:100%;border:1px solid #f9a6c1;border-radius:.9rem;padding:.55rem .8rem;background:#fff}
+.f input[type=checkbox]{margin-right:.4rem}</style></head>
+<body class="font-sans bg-blush-50 text-stone-700 min-h-screen">
+{% if user.is_authenticated %}
+<nav class="bg-white border-b border-blush-100 sticky top-0 z-10">
+ <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-1 sm:gap-4 overflow-x-auto text-sm font-semibold">
+  <a href="{% url 'dashboard:index' %}" class="font-display italic text-2xl text-blush-500 mr-2">{{ SHOP_NAME }}</a>
+  <a href="{% url 'dashboard:index' %}" class="px-3 py-1.5 rounded-full hover:bg-blush-100">Overview</a>
+  <a href="{% url 'dashboard:orders' %}" class="px-3 py-1.5 rounded-full hover:bg-blush-100">Orders</a>
+  <a href="{% url 'dashboard:products' %}" class="px-3 py-1.5 rounded-full hover:bg-blush-100">Products</a>
+  <a href="{% url 'dashboard:categories' %}" class="px-3 py-1.5 rounded-full hover:bg-blush-100">Categories</a>
+  <a href="{% url 'store:home' %}" target="_blank" class="ml-auto px-3 py-1.5 rounded-full hover:bg-blush-100">View shop</a>
+  <form method="post" action="{% url 'dashboard:logout' %}">{% csrf_token %}<button class="px-3 py-1.5 rounded-full hover:bg-blush-100">Log out</button></form>
+ </div></nav>{% endif %}
+<main class="max-w-6xl mx-auto px-4 py-6">
+ {% for m in messages %}<p class="mb-4 rounded-2xl px-4 py-3 {% if m.tags == 'error' %}bg-red-50 text-red-600{% else %}bg-green-50 text-green-700{% endif %}">{{ m }}</p>{% endfor %}
+ {% block content %}{% endblock %}
+</main></body></html>

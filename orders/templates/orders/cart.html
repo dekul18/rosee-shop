@@ -1,0 +1,44 @@
+{% extends "store/base.html" %}
+{% block title %}Your cart · {{ SHOP_NAME }}{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 pt-8">
+ <h1 class="font-display text-4xl font-semibold mb-6">Your cart</h1>
+ {% for m in messages %}<p class="mb-4 rounded-2xl bg-red-50 text-red-600 px-4 py-3">{{ m }}</p>{% endfor %}
+ {% if items %}
+ <div class="grid md:grid-cols-5 gap-8">
+  <div class="md:col-span-3 space-y-3">
+   {% for i in items %}
+   <div class="flex gap-3 bg-white dark:bg-plum rounded-3xl p-3">
+    <div class="w-20 h-24 rounded-2xl overflow-hidden ph grid place-items-center text-2xl shrink-0">
+     {% if i.product.main_image %}<img src="{{ i.product.main_image }}" alt="" class="w-full h-full object-cover">{% else %}🌸{% endif %}</div>
+    <div class="flex-1">
+     <p class="font-semibold">{{ i.product.name }}</p>
+     <p class="text-sm text-stone-500">{{ i.size }}{% if i.color %} · {{ i.color }}{% endif %}</p>
+     <p class="text-blush-500 font-bold">{{ i.subtotal|floatformat:0 }} DZD</p>
+     <div class="flex items-center gap-2 mt-2">
+      <form method="post">{% csrf_token %}<input type="hidden" name="key" value="{{ i.key }}">
+       <input type="number" name="qty" value="{{ i.qty }}" min="0" max="{{ i.product.stock }}" class="field !w-16 !py-1" aria-label="Quantity" onchange="this.form.submit()"></form>
+      <form method="post">{% csrf_token %}<input type="hidden" name="key" value="{{ i.key }}"><input type="hidden" name="action" value="remove">
+       <button class="text-sm text-stone-500 underline">Remove</button></form>
+     </div></div></div>
+   {% endfor %}
+  </div>
+  <form method="post" action="{% url 'orders:checkout' %}" class="md:col-span-2 bg-white dark:bg-plum rounded-3xl p-5 space-y-3 h-fit">
+   {% csrf_token %}
+   <h2 class="font-display text-2xl font-semibold">Delivery details</h2>
+   {{ form.non_field_errors }}
+   {% for f in form %}
+   <div><label class="text-sm font-semibold" for="{{ f.id_for_label }}">{{ f.label }}</label>
+    {{ f }}{% if f.errors %}<p class="text-sm text-red-500">{{ f.errors.0 }}</p>{% endif %}</div>
+   {% endfor %}
+   <div class="flex justify-between font-bold text-lg pt-2"><span>Total</span><span>{{ total|floatformat:0 }} DZD</span></div>
+   <p class="text-sm text-stone-500">You pay in cash when your order arrives.</p>
+   <button class="btn w-full rounded-full bg-blush-500 text-white font-bold py-3">Place order</button>
+  </form>
+ </div>
+ <script>document.querySelectorAll('input:not([type=hidden]):not([type=number]),textarea').forEach(e=>e.classList.add('field'))</script>
+ {% else %}
+ <p class="py-16 text-center">Your cart is empty. <a class="text-blush-500 underline" href="{% url 'store:shop' %}">Find something you love</a>.</p>
+ {% endif %}
+</section>
+{% endblock %}
