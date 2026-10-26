@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from django.contrib.auth import get_user_model
@@ -52,6 +53,9 @@ class Command(BaseCommand):
                             img.image.save(f.name, File(fh), save=True)
         User = get_user_model()
         if not User.objects.filter(is_superuser=True).exists():
-            User.objects.create_superuser("admin", "admin@example.com", "admin12345")
-            self.stdout.write("Created admin / admin12345 - change this password!")
+            # Set DJANGO_SUPERUSER_USERNAME / DJANGO_SUPERUSER_PASSWORD to choose your own (do this when deploying).
+            user = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
+            password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin12345")
+            User.objects.create_superuser(user, "admin@example.com", password)
+            self.stdout.write(f"Created admin user '{user}'." + (" Default password admin12345: change it!" if password == "admin12345" else ""))
         self.stdout.write(self.style.SUCCESS("Sample data ready."))

@@ -21,9 +21,29 @@ Rename the shop with `SHOP_NAME` in `.env`.
 - **Products**: category is required; name, description, price, sizes and colors (comma separated), stock, several photos, visible/hidden, show on homepage.
 - **Orders**: Pending → Confirmed → Shipped → Delivered → Done (or Cancelled). Stock drops when an order is placed.
 
-## Deploy (Render / Railway / VPS)
-1. Create a PostgreSQL database and set `DATABASE_URL`.
-2. Set `DEBUG=0`, a long random `SECRET_KEY`, `ALLOWED_HOSTS=yourdomain.com`, `CSRF_TRUSTED_ORIGINS=https://yourdomain.com`.
-3. Build: `pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
-4. Start: `gunicorn config.wsgi`
-5. Uploaded photos live in `media/`. Attach a persistent disk there, otherwise they disappear on redeploy (or move to S3/Cloudinary later).
+## Deploy on Vercel (+ Neon database + Cloudinary photos)
+Vercel cannot keep a database file or uploaded photos, so the live site needs two free services:
+**Neon** (PostgreSQL) and **Cloudinary** (product photos).
+
+1. **Neon**: create a project, copy the connection string (`postgresql://...`).
+2. **Cloudinary**: sign up, open the dashboard, copy the "API Environment variable" (`cloudinary://...`).
+3. **Create the tables and sample products from your computer** (venv activated, `pip install -r requirements.txt` done), PowerShell:
+   ```
+   $env:DATABASE_URL="your-neon-string"
+   $env:CLOUDINARY_URL="your-cloudinary-string"
+   $env:DJANGO_SUPERUSER_USERNAME="your-admin-name"
+   $env:DJANGO_SUPERUSER_PASSWORD="a-strong-password"
+   python manage.py migrate
+   python manage.py seed
+   ```
+4. **Generate a secret key**:
+   `python -c "from django.core.management.utils import get_random_secret_key as g; print(g())"`
+5. **Vercel -> Settings -> Environment Variables**, add exactly these three: `SECRET_KEY`, `DATABASE_URL`, `CLOUDINARY_URL`.
+6. Push to GitHub (`git add . && git commit -m "deploy" && git push`). Vercel redeploys on its own.
+7. Open your `.vercel.app` address; the admin is at `/dashboard/`.
+
+If the site shows "Server Error (500)", open Vercel -> Logs; the error message says which variable is missing.
+
+## Deploy elsewhere (Render, VPS)
+Build: `pip install -r requirements.txt && python manage.py migrate` — Start: `gunicorn config.wsgi`.
+Set `SECRET_KEY` and `DATABASE_URL` (and `CLOUDINARY_URL` for photos). Hosts and CSRF origins are set automatically on Render/Vercel.
