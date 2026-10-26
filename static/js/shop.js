@@ -88,8 +88,8 @@
   $('#m-close').onclick = close;
   modal.addEventListener('click', e => { if (e.target === modal) close(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-  $('#q-').onclick = () => { qty = Math.max(1, qty - 1); $('#q').textContent = qty; };
-  $('#q+').onclick = () => { qty = Math.min(cur.stock || 1, qty + 1); $('#q').textContent = qty; };
+  $('#q-minus').onclick = () => { qty = Math.max(1, qty - 1); $('#q').textContent = qty; };
+  $('#q-plus').onclick = () => { qty = Math.min(cur.stock || 1, qty + 1); $('#q').textContent = qty; };
 
   $('#m-add').onclick = async () => {
     const err = $('#m-err'); err.classList.add('hidden');
