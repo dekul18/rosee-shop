@@ -2,10 +2,13 @@ from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.db.models import Count, Sum
 from django.db.models.deletion import ProtectedError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 from orders.models import Order
 from store.models import Category, Product, ProductImage
+from store.sample_data import load_samples, pending as pending_samples
 from .forms import CategoryForm, ProductForm
 
 LOW_STOCK = 5
@@ -65,7 +68,26 @@ def products(request):
     cat = request.GET.get("cat")
     if cat:
         qs = qs.filter(category_id=cat)
-    return render(request, "dashboard/products.html", {"products": qs, "categories": Category.objects.all(), "cat": cat})
+    return render(request, "dashboard/products.html", {
+        "products": qs, "categories": Category.objects.all(), "cat": cat, "samples_missing": len(pending_samples())})
+
+
+@staff_required
+@require_POST
+def import_samples(request):
+    """Add the sample products straight from the dashboard (a few per click, so it stays under the host's time limit)."""
+    try:
+        created, left = load_samples(limit=4)
+    except Exception as e:  # show the real reason (e.g. Cloudinary not configured) instead of a blank 500
+        messages.error(request, f"Could not add the products: {type(e).__name__}: {e}")
+        return redirect("dashboard:products")
+    if created == 0:
+        messages.success(request, "All sample products are already in your shop.")
+    elif left:
+        messages.success(request, f"{created} products added. {left} more to go — click the button again.")
+    else:
+        messages.success(request, f"{created} products added. All sample products are now in your shop.")
+    return redirect("dashboard:products")
 
 
 @staff_required
@@ -113,3 +135,23 @@ def order_detail(request, pk):
             messages.success(request, f"Order #{order.pk} is now {order.get_status_display().lower()}.")
         return redirect("dashboard:order_detail", pk=pk)
     return render(request, "dashboard/order_detail.html", {"order": order, "statuses": Order.STATUS})
+
+
+@staff_required
+@require_POST
+def order_status(request, pk):
+    """Change an order's status from the drop-down (works with fetch and as a plain form post)."""
+    order = get_object_or_404(Order, pk=pk)
+    new = request.POST.get("status")
+    ok = new in dict(Order.STATUS)
+    if ok:
+        order.status = new
+        order.save(update_fields=["status"])
+    if request.headers.get("X-Requested-With") == "fetch":
+        return JsonResponse({"ok": ok, "status": order.status, "label": order.get_status_display()}, status=200 if ok else 400)
+    if ok:
+        messages.success(request, f"Order #{order.pk} is now {order.get_status_display().lower()}.")
+    nxt = request.POST.get("next", "")
+    if nxt and url_has_allowed_host_and_scheme(nxt, allowed_hosts={request.get_host()}):
+        return redirect(nxt)
+    return redirect("dashboard:orders")

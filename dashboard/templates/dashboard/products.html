@@ -7,6 +7,9 @@
   <option value="">All categories</option>{% for c in categories %}<option value="{{ c.pk }}" {% if cat == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select></form>
  <a href="{% url 'dashboard:product_new' %}" class="rounded-full bg-blush-500 text-white font-bold px-5 py-2">Add product</a>
 </div>
+{% if samples_missing %}<form method="post" action="{% url 'dashboard:import_samples' %}" class="mb-4 rounded-3xl bg-lilac-100 px-5 py-4 flex flex-wrap items-center gap-3">{% csrf_token %}
+ <p class="font-semibold">{{ samples_missing }} sample product{{ samples_missing|pluralize }} (with photos, descriptions and prices) ready to add.</p>
+ <button class="ml-auto rounded-full bg-lilac-500 text-white font-bold px-5 py-2" onclick="this.disabled=true;this.textContent='Adding… please wait';this.form.submit()">Add sample products</button></form>{% endif %}
 <div class="bg-white rounded-3xl p-3 overflow-x-auto">
  <table class="w-full text-left"><thead class="text-sm"><tr><th class="p-2">Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
  {% for p in products %}<tr class="border-t border-blush-50">

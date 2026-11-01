@@ -8,6 +8,6 @@
 </div>
 <div class="bg-white rounded-3xl p-3 overflow-x-auto"><table class="w-full text-left">
  <thead class="text-sm"><tr><th class="p-2">#</th><th>Customer</th><th>Wilaya</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
- {% for o in orders %}<tr class="border-t border-blush-50"><td class="p-2"><a class="underline" href="{% url 'dashboard:order_detail' o.pk %}">#{{ o.pk }}</a></td><td>{{ o.full_name }}<br><span class="text-xs">{{ o.phone }}</span></td><td>{{ o.wilaya }}</td><td>{{ o.total|floatformat:0 }} DZD</td><td>{{ o.get_status_display }}</td><td class="text-sm">{{ o.created_at|date:"d M, H:i" }}</td></tr>
+ {% for o in orders %}<tr class="border-t border-blush-50"><td class="p-2"><a class="underline" href="{% url 'dashboard:order_detail' o.pk %}">#{{ o.pk }}</a></td><td>{{ o.full_name }}<br><span class="text-xs">{{ o.phone }}</span></td><td>{{ o.wilaya }}</td><td>{{ o.total|floatformat:0 }} DZD</td><td class="whitespace-nowrap"><select class="status-select rounded-full border px-3 py-1 text-sm font-semibold cursor-pointer" data-url="{% url 'dashboard:order_status' o.pk %}" data-csrf="{{ csrf_token }}" aria-label="Order #{{ o.pk }} status">{% for v, l in statuses %}<option value="{{ v }}" {% if o.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select> <span class="saved text-xs text-green-600"></span></td><td class="text-sm">{{ o.created_at|date:"d M, H:i" }}</td></tr>
  {% empty %}<tr><td colspan="6" class="p-4">No orders here yet.</td></tr>{% endfor %}</table></div>
 {% endblock %}
